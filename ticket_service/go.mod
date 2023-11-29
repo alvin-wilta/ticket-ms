@@ -1,10 +1,12 @@
-module github.com/alvin-wilta/ticket-ms
+module github.com/alvin-wilta/ticket-ms/ticket_service
 
 go 1.21.4
 
 require (
 	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
+	gorm.io/driver/postgres v1.5.4
+	gorm.io/gorm v1.25.5
 )
 
 require (
@@ -19,6 +21,4 @@ require (
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect
-	gorm.io/driver/postgres v1.5.4 // indirect
-	gorm.io/gorm v1.25.5 // indirect
 )

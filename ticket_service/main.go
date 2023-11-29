@@ -11,7 +11,8 @@ func main() {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 
-	grpcServer := InitGRPC()
+	db := InitDB()
+	grpcServer := InitGRPC(db)
 
 	log.Println("Server is listening on port 50051...")
 	if err := grpcServer.Serve(listen); err != nil {

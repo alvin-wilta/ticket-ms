@@ -19,7 +19,30 @@ message GetTicketListResponse {
     repeated Ticket tickets = 1;
 }
 
+message CreateTicketRequest {
+    string title = 2;
+    string description = 3;
+    string status = 5;
+    string name = 4;
+}
+
+message CreateTicketResponse {
+    int32 id = 1;
+    bool success = 2;
+}
+
+message DeleteTicketRequest {
+    int32 id = 1;
+}
+
+message DeleteTicketResponse {
+    int32 id = 1;
+    bool success = 2;
+}
+
 service TicketService {
     rpc HealthCheck(Empty) returns (HealthCheckResponse);
     rpc GetTicketList(Empty) returns (GetTicketListResponse);
+    rpc CreateTicket(CreateTicketRequest) returns (CreateTicketResponse);
+    rpc DeleteTicket(DeleteTicketRequest) returns (DeleteTicketResponse);
 }

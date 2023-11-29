@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-h", "db"]
+      interval: 5s
+      timeout: 60s
+      retries: 5
+
+  ticket_service:
+    build:
+      context: .
+      dockerfile: ./ticket_service/Dockerfile
+    environment:
+      PORT: 50051
+      DOCKER_BUILDKIT: 0
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+    ports:
+      - "50051:50051"
+    expose:
+      - 50051
+    networks:
+      - app-network
+  
+networks:
+  app-network:
+    driver: bridge
+  
+# volumes:
+#   db:
+#     driver: local
