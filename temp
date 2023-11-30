@@ -1,0 +1,53 @@
+# ANCHOR: Get tickets
+type Ticket {
+  id: ID
+  title: String!
+  description: String
+  Status: String
+  Name: String!
+}
+
+# ANCHOR: Create Ticket
+input NewTicket {
+  title: String!
+  description: String!
+  name: String!
+}
+
+type CreateTicketResponse {
+  id: ID!
+  success: Boolean!
+}
+
+# ANCHOR: Update Ticket
+input UpdateTicket {
+  id: ID!
+  status: String!
+}
+
+type UpdateTicketResponse {
+  id: ID!
+  success: Boolean!
+}
+
+# ANCHOR: Delete ticket
+input DeleteTicket {
+  id: ID!
+}
+
+type DeleteTicketResponse {
+  id: ID!
+  success: Boolean!
+}
+
+# ANCHOR: Queries and Mutations
+type Query {
+  healthCheck: String!
+  tickets: [Ticket!]!
+}
+
+type Mutation {
+  createTicket(input: NewTicket!): CreateTicketResponse!
+  updateTicket(input: UpdateTicket!): UpdateTicketResponse!
+  deleteTicket(input: DeleteTicket): DeleteTicketResponse!
+}

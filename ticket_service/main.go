@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	listen, err := net.Listen("tcp", ":50051")
+	listen, err := net.Listen("tcp", "localhost:50051")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}

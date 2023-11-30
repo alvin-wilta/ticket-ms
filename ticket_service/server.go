@@ -52,7 +52,7 @@ func (s *Server) GetTicketList(ctx context.Context, req *pb.Empty) (*pb.GetTicke
 }
 
 func (s *Server) CreateTicket(ctx context.Context, req *pb.CreateTicketRequest) (*pb.CreateTicketResponse, error) {
-	log.Print("[RPC] GetTicketList")
+	log.Print("[RPC] CreateTicket")
 	res := pb.CreateTicketResponse{}
 
 	ticket := Ticket{
