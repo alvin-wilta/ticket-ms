@@ -15,7 +15,6 @@ input NewTicket {
 }
 
 type CreateTicketResponse {
-  id: Int!
   success: Boolean!
 }
 
@@ -49,5 +48,5 @@ type Query {
 type Mutation {
   createTicket(input: NewTicket!): CreateTicketResponse!
   updateTicket(input: UpdateTicket!): UpdateTicketResponse!
-  deleteTicket(input: DeleteTicket): DeleteTicketResponse!
+  deleteTicket(input: DeleteTicket!): DeleteTicketResponse!
 }

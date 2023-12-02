@@ -5,6 +5,7 @@ import (
 	"log"
 
 	pb "github.com/alvin-wilta/ticket-ms/proto"
+	"github.com/alvin-wilta/ticket-ms/ticket_service/db"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 )
@@ -30,7 +31,7 @@ func (s *Server) HealthCheck(ctx context.Context, req *pb.Empty) (*pb.HealthChec
 
 func (s *Server) GetTicketList(ctx context.Context, req *pb.Empty) (*pb.GetTicketListResponse, error) {
 	log.Print("[RPC] GetTicketList")
-	var tickets []Ticket
+	var tickets []db.Ticket
 	var res pb.GetTicketListResponse
 
 	result := s.db.Find(&tickets)
@@ -55,7 +56,7 @@ func (s *Server) CreateTicket(ctx context.Context, req *pb.CreateTicketRequest) 
 	log.Print("[RPC] CreateTicket")
 	res := pb.CreateTicketResponse{}
 
-	ticket := Ticket{
+	ticket := db.Ticket{
 		Title:       req.Title,
 		Description: req.Description,
 		Status:      req.Status,
@@ -78,7 +79,7 @@ func (s *Server) DeleteTicket(ctx context.Context, req *pb.DeleteTicketRequest) 
 	res.Id = req.Id
 	res.Success = true
 
-	result := s.db.Delete(&Ticket{
+	result := s.db.Delete(&db.Ticket{
 		ID: uint(req.Id),
 	})
 	if result.Error != nil {

@@ -3,7 +3,6 @@
 package model
 
 type CreateTicketResponse struct {
-	ID      int  `json:"id"`
 	Success bool `json:"success"`
 }
 

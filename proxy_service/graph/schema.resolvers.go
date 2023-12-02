@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/alvin-wilta/ticket-ms/proto"
@@ -15,26 +14,54 @@ import (
 
 // CreateTicket is the resolver for the createTicket field.
 func (r *mutationResolver) CreateTicket(ctx context.Context, input model.NewTicket) (*model.CreateTicketResponse, error) {
-	log.Printf("Createticket called")
-	// return &model.CreateTicketResponse{
-	// 	ID:      "1",
-	// 	Success: true,
-	// }, nil
-	panic("any")
+	log.Print("[GQL] Request CreateTicket")
+	err := r.handlerNSQ.PublishCreateTicket(input)
+	res := &model.CreateTicketResponse{
+		Success: true,
+	}
+	if err != nil {
+		res.Success = false
+		log.Panicf("[GQL] CreateTicket err: %v", err)
+		return res, err
+	}
+	return res, nil
 }
 
 // UpdateTicket is the resolver for the updateTicket field.
 func (r *mutationResolver) UpdateTicket(ctx context.Context, input model.UpdateTicket) (*model.UpdateTicketResponse, error) {
-	panic(fmt.Errorf("not implemented: UpdateTicket - updateTicket"))
+	log.Print("[GQL] Request UpdateTicket")
+	err := r.handlerNSQ.PublishUpdateTicket(input)
+	res := &model.UpdateTicketResponse{
+		ID:      input.ID,
+		Success: true,
+	}
+	if err != nil {
+		res.Success = false
+		log.Panicf("[GQL] UpdateTicket err: %v", err)
+		return res, err
+	}
+	return res, nil
 }
 
 // DeleteTicket is the resolver for the deleteTicket field.
-func (r *mutationResolver) DeleteTicket(ctx context.Context, input *model.DeleteTicket) (*model.DeleteTicketResponse, error) {
-	panic(fmt.Errorf("not implemented: DeleteTicket - deleteTicket"))
+func (r *mutationResolver) DeleteTicket(ctx context.Context, input model.DeleteTicket) (*model.DeleteTicketResponse, error) {
+	log.Print("[GQL] Request DeleteTicket")
+	err := r.handlerNSQ.PublishDeleteTicket(input)
+	res := &model.DeleteTicketResponse{
+		ID:      input.ID,
+		Success: true,
+	}
+	if err != nil {
+		res.Success = false
+		log.Panicf("[GQL] DeleteTicket err: %v", err)
+		return res, err
+	}
+	return res, nil
 }
 
 // HealthCheck is the resolver for the healthCheck field.
 func (r *queryResolver) HealthCheck(ctx context.Context) (string, error) {
+	log.Print("[GQL] Request Healthcheck")
 	res, err := r.Resolver.grpcClient.HealthCheck(ctx, &proto.Empty{})
 	if err != nil {
 		log.Panicf("[GQL] HealthCheck err: %v", err)
@@ -47,6 +74,7 @@ func (r *queryResolver) HealthCheck(ctx context.Context) (string, error) {
 
 // Tickets is the resolver for the tickets field.
 func (r *queryResolver) Tickets(ctx context.Context) ([]*model.Ticket, error) {
+	log.Print("[GQL] Request Tickets")
 	var ticketList []*model.Ticket
 	res, err := r.Resolver.grpcClient.GetTicketList(ctx, &proto.Empty{})
 	if err != nil {

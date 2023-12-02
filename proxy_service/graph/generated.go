@@ -48,7 +48,6 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	CreateTicketResponse struct {
-		ID      func(childComplexity int) int
 		Success func(childComplexity int) int
 	}
 
@@ -59,7 +58,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateTicket func(childComplexity int, input model.NewTicket) int
-		DeleteTicket func(childComplexity int, input *model.DeleteTicket) int
+		DeleteTicket func(childComplexity int, input model.DeleteTicket) int
 		UpdateTicket func(childComplexity int, input model.UpdateTicket) int
 	}
 
@@ -85,7 +84,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateTicket(ctx context.Context, input model.NewTicket) (*model.CreateTicketResponse, error)
 	UpdateTicket(ctx context.Context, input model.UpdateTicket) (*model.UpdateTicketResponse, error)
-	DeleteTicket(ctx context.Context, input *model.DeleteTicket) (*model.DeleteTicketResponse, error)
+	DeleteTicket(ctx context.Context, input model.DeleteTicket) (*model.DeleteTicketResponse, error)
 }
 type QueryResolver interface {
 	HealthCheck(ctx context.Context) (string, error)
@@ -110,13 +109,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
-
-	case "CreateTicketResponse.id":
-		if e.complexity.CreateTicketResponse.ID == nil {
-			break
-		}
-
-		return e.complexity.CreateTicketResponse.ID(childComplexity), true
 
 	case "CreateTicketResponse.success":
 		if e.complexity.CreateTicketResponse.Success == nil {
@@ -161,7 +153,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteTicket(childComplexity, args["input"].(*model.DeleteTicket)), true
+		return e.complexity.Mutation.DeleteTicket(childComplexity, args["input"].(model.DeleteTicket)), true
 
 	case "Mutation.updateTicket":
 		if e.complexity.Mutation.UpdateTicket == nil {
@@ -383,10 +375,10 @@ func (ec *executionContext) field_Mutation_createTicket_args(ctx context.Context
 func (ec *executionContext) field_Mutation_deleteTicket_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.DeleteTicket
+	var arg0 model.DeleteTicket
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalODeleteTicket2ᚖgithubᚗcomᚋalvinᚑwiltaᚋticketᚑmsᚋproxy_serviceᚋgraphᚋmodelᚐDeleteTicket(ctx, tmp)
+		arg0, err = ec.unmarshalNDeleteTicket2githubᚗcomᚋalvinᚑwiltaᚋticketᚑmsᚋproxy_serviceᚋgraphᚋmodelᚐDeleteTicket(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -462,50 +454,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _CreateTicketResponse_id(ctx context.Context, field graphql.CollectedField, obj *model.CreateTicketResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_CreateTicketResponse_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_CreateTicketResponse_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "CreateTicketResponse",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
 
 func (ec *executionContext) _CreateTicketResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.CreateTicketResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CreateTicketResponse_success(ctx, field)
@@ -678,8 +626,6 @@ func (ec *executionContext) fieldContext_Mutation_createTicket(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_CreateTicketResponse_id(ctx, field)
 			case "success":
 				return ec.fieldContext_CreateTicketResponse_success(ctx, field)
 			}
@@ -775,7 +721,7 @@ func (ec *executionContext) _Mutation_deleteTicket(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteTicket(rctx, fc.Args["input"].(*model.DeleteTicket))
+		return ec.resolvers.Mutation().DeleteTicket(rctx, fc.Args["input"].(model.DeleteTicket))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3256,11 +3202,6 @@ func (ec *executionContext) _CreateTicketResponse(ctx context.Context, sel ast.S
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CreateTicketResponse")
-		case "id":
-			out.Values[i] = ec._CreateTicketResponse_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "success":
 			out.Values[i] = ec._CreateTicketResponse_success(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3939,6 +3880,11 @@ func (ec *executionContext) marshalNCreateTicketResponse2ᚖgithubᚗcomᚋalvin
 	return ec._CreateTicketResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNDeleteTicket2githubᚗcomᚋalvinᚑwiltaᚋticketᚑmsᚋproxy_serviceᚋgraphᚋmodelᚐDeleteTicket(ctx context.Context, v interface{}) (model.DeleteTicket, error) {
+	res, err := ec.unmarshalInputDeleteTicket(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNDeleteTicketResponse2githubᚗcomᚋalvinᚑwiltaᚋticketᚑmsᚋproxy_serviceᚋgraphᚋmodelᚐDeleteTicketResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteTicketResponse) graphql.Marshaler {
 	return ec._DeleteTicketResponse(ctx, sel, &v)
 }
@@ -4338,14 +4284,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
-}
-
-func (ec *executionContext) unmarshalODeleteTicket2ᚖgithubᚗcomᚋalvinᚑwiltaᚋticketᚑmsᚋproxy_serviceᚋgraphᚋmodelᚐDeleteTicket(ctx context.Context, v interface{}) (*model.DeleteTicket, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputDeleteTicket(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {

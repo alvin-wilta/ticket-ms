@@ -11,6 +11,8 @@ require (
 	gorm.io/gorm v1.25.5
 )
 
+require github.com/golang/snappy v0.0.1 // indirect
+
 require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -18,6 +20,7 @@ require (
 	github.com/jackc/pgx/v5 v5.4.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/nsqio/go-nsq v1.1.0
 	github.com/stretchr/testify v1.8.2 // indirect
 	golang.org/x/crypto v0.16.0 // indirect
 	golang.org/x/net v0.19.0 // indirect

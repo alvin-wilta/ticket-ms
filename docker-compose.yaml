@@ -1,5 +1,6 @@
 version: '3.8'
 services:
+  #SECTION - Databases
   db:
     image: postgres
     restart: always
@@ -16,7 +17,34 @@ services:
       interval: 5s
       timeout: 60s
       retries: 5
+      
+  #!SECTION
+  #SECTION - NSQ
+  nsqlookupd:
+    image: nsqio/nsq
+    command: /nsqlookupd
+    ports:
+      - "4160:4160"
+      - "4161:4161"
+    restart: always
+  nsqd:
+    image: nsqio/nsq
+    command:  /nsqd --broadcast-address=nsqd --lookupd-tcp-address=nsqlookupd:4160
+    depends_on:
+      - nsqlookupd
+    ports:
+      - "4151:4151"
+      - "4150:4150"
+  nsqadmin:
+    image: nsqio/nsq
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+    depends_on:
+      - nsqlookupd  
+    ports:
+      - "4171:4171"
 
+  #!SECTION
+  #SECTION - Services
   ticket_service:
     build:
       context: .
@@ -27,6 +55,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      nsqlookupd:
+        condition: service_started
     restart: on-failure
     ports:
       - "50051:50051"
@@ -34,6 +64,31 @@ services:
       - 50051
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http:localhost:50051/health"]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
+
+  proxy_service:
+    build:
+      context: .
+      dockerfile: ./proxy_service/Dockerfile
+    environment:
+      - PORT: 50001
+      - DOCKER_BUILDKIT: 0
+    expose:
+      - 50001
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+      nsqd:
+        condition: service_started
+    restart: on-failure
+  
   
 networks:
   app-network:

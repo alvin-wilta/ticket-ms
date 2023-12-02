@@ -1,4 +1,4 @@
-package main
+package db
 
 type Ticket struct {
 	ID          uint   `json:"id" gorm:"primaryKey,autoIncrement"`
