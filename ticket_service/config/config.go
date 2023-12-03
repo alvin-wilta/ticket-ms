@@ -20,6 +20,8 @@ type Config struct {
 	PostgresPort   string `env:"POSTGRES_PORT,required"`
 	PostgresUser   string `env:"POSTGRES_USER,required"`
 	PostgresPass   string `env:"POSTGRES_PASS,required"`
+	RedisAddr      string `env:"REDIS_ADDR"`
+	RedisPort      string `env:"REDIS_PORT"`
 }
 
 func New() *Config {

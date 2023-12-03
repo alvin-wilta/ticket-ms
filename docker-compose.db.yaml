@@ -12,6 +12,15 @@ services:
     volumes: 
       - db:/var/lib/postgresql/data
 
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --loglevel warning
+    volumes: 
+      - cache:/data
+
   nsqlookupd:
     image: nsqio/nsq
     command: /nsqlookupd -broadcast-address=nsqd
@@ -37,4 +46,6 @@ services:
   
 volumes:
   db:
+    driver: local
+  cache:
     driver: local

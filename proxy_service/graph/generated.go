@@ -64,7 +64,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		HealthCheck func(childComplexity int) int
-		Tickets     func(childComplexity int) int
+		Tickets     func(childComplexity int, input *model.TicketFilter) int
 	}
 
 	Ticket struct {
@@ -88,7 +88,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	HealthCheck(ctx context.Context) (string, error)
-	Tickets(ctx context.Context) ([]*model.Ticket, error)
+	Tickets(ctx context.Context, input *model.TicketFilter) ([]*model.Ticket, error)
 }
 
 type executableSchema struct {
@@ -179,7 +179,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Tickets(childComplexity), true
+		args, err := ec.field_Query_tickets_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Tickets(childComplexity, args["input"].(*model.TicketFilter)), true
 
 	case "Ticket.description":
 		if e.complexity.Ticket.Description == nil {
@@ -195,14 +200,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Ticket.ID(childComplexity), true
 
-	case "Ticket.Name":
+	case "Ticket.name":
 		if e.complexity.Ticket.Name == nil {
 			break
 		}
 
 		return e.complexity.Ticket.Name(childComplexity), true
 
-	case "Ticket.Status":
+	case "Ticket.status":
 		if e.complexity.Ticket.Status == nil {
 			break
 		}
@@ -240,6 +245,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputDeleteTicket,
 		ec.unmarshalInputNewTicket,
+		ec.unmarshalInputTicketFilter,
 		ec.unmarshalInputUpdateTicket,
 	)
 	first := true
@@ -414,6 +420,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_tickets_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TicketFilter
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOTicketFilter2ᚖgithubᚗcomᚋalvinᚑwiltaᚋticketᚑmsᚋproxy_serviceᚋgraphᚋmodelᚐTicketFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -826,7 +847,7 @@ func (ec *executionContext) _Query_tickets(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Tickets(rctx)
+		return ec.resolvers.Query().Tickets(rctx, fc.Args["input"].(*model.TicketFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -857,13 +878,24 @@ func (ec *executionContext) fieldContext_Query_tickets(ctx context.Context, fiel
 				return ec.fieldContext_Ticket_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Ticket_description(ctx, field)
-			case "Status":
-				return ec.fieldContext_Ticket_Status(ctx, field)
-			case "Name":
-				return ec.fieldContext_Ticket_Name(ctx, field)
+			case "status":
+				return ec.fieldContext_Ticket_status(ctx, field)
+			case "name":
+				return ec.fieldContext_Ticket_name(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Ticket", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_tickets_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -1123,8 +1155,8 @@ func (ec *executionContext) fieldContext_Ticket_description(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Ticket_Status(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Ticket_Status(ctx, field)
+func (ec *executionContext) _Ticket_status(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Ticket_status(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1151,7 +1183,7 @@ func (ec *executionContext) _Ticket_Status(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Ticket_Status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Ticket_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Ticket",
 		Field:      field,
@@ -1164,8 +1196,8 @@ func (ec *executionContext) fieldContext_Ticket_Status(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Ticket_Name(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Ticket_Name(ctx, field)
+func (ec *executionContext) _Ticket_name(ctx context.Context, field graphql.CollectedField, obj *model.Ticket) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Ticket_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1195,7 +1227,7 @@ func (ec *executionContext) _Ticket_Name(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Ticket_Name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Ticket_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Ticket",
 		Field:      field,
@@ -3145,6 +3177,44 @@ func (ec *executionContext) unmarshalInputNewTicket(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputTicketFilter(ctx context.Context, obj interface{}) (model.TicketFilter, error) {
+	var it model.TicketFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateTicket(ctx context.Context, obj interface{}) (model.UpdateTicket, error) {
 	var it model.UpdateTicket
 	asMap := map[string]interface{}{}
@@ -3451,10 +3521,10 @@ func (ec *executionContext) _Ticket(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "description":
 			out.Values[i] = ec._Ticket_description(ctx, field, obj)
-		case "Status":
-			out.Values[i] = ec._Ticket_Status(ctx, field, obj)
-		case "Name":
-			out.Values[i] = ec._Ticket_Name(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._Ticket_status(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._Ticket_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4316,6 +4386,14 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOTicketFilter2ᚖgithubᚗcomᚋalvinᚑwiltaᚋticketᚑmsᚋproxy_serviceᚋgraphᚋmodelᚐTicketFilter(ctx context.Context, v interface{}) (*model.TicketFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputTicketFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

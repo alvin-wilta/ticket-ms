@@ -3,8 +3,13 @@ type Ticket {
   id: Int
   title: String!
   description: String
-  Status: String
-  Name: String!
+  status: String
+  name: String!
+}
+
+input TicketFilter {
+  id: Int
+  status: String
 }
 
 # ANCHOR: Create Ticket
@@ -42,7 +47,7 @@ type DeleteTicketResponse {
 # ANCHOR: Queries and Mutations
 type Query {
   healthCheck: String!
-  tickets: [Ticket!]!
+  tickets(input: TicketFilter): [Ticket!]!
 }
 
 type Mutation {

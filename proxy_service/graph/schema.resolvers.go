@@ -30,15 +30,20 @@ func (r *mutationResolver) CreateTicket(ctx context.Context, input model.NewTick
 // UpdateTicket is the resolver for the updateTicket field.
 func (r *mutationResolver) UpdateTicket(ctx context.Context, input model.UpdateTicket) (*model.UpdateTicketResponse, error) {
 	log.Print("[GQL] Request UpdateTicket")
-	err := r.handlerNSQ.PublishUpdateTicket(input)
+	req := &proto.UpdateTicketRequest{
+		Id:     int32(input.ID),
+		Status: input.Status,
+	}
 	res := &model.UpdateTicketResponse{
 		ID:      input.ID,
 		Success: true,
 	}
+	grpcRes, err := r.Resolver.grpcClient.UpdateTicket(ctx, req)
 	if err != nil {
-		res.Success = false
 		log.Panicf("[GQL] UpdateTicket err: %v", err)
-		return res, err
+	}
+	if !grpcRes.Success {
+		res.Success = false
 	}
 	return res, nil
 }
@@ -46,15 +51,19 @@ func (r *mutationResolver) UpdateTicket(ctx context.Context, input model.UpdateT
 // DeleteTicket is the resolver for the deleteTicket field.
 func (r *mutationResolver) DeleteTicket(ctx context.Context, input model.DeleteTicket) (*model.DeleteTicketResponse, error) {
 	log.Print("[GQL] Request DeleteTicket")
-	err := r.handlerNSQ.PublishDeleteTicket(input)
+	req := &proto.DeleteTicketRequest{
+		Id: int32(input.ID),
+	}
 	res := &model.DeleteTicketResponse{
 		ID:      input.ID,
 		Success: true,
 	}
+	grpcRes, err := r.Resolver.grpcClient.DeleteTicket(ctx, req)
 	if err != nil {
-		res.Success = false
 		log.Panicf("[GQL] DeleteTicket err: %v", err)
-		return res, err
+	}
+	if !grpcRes.Success {
+		res.Success = false
 	}
 	return res, nil
 }
@@ -73,10 +82,19 @@ func (r *queryResolver) HealthCheck(ctx context.Context) (string, error) {
 }
 
 // Tickets is the resolver for the tickets field.
-func (r *queryResolver) Tickets(ctx context.Context) ([]*model.Ticket, error) {
+func (r *queryResolver) Tickets(ctx context.Context, input *model.TicketFilter) ([]*model.Ticket, error) {
 	log.Print("[GQL] Request Tickets")
 	var ticketList []*model.Ticket
-	res, err := r.Resolver.grpcClient.GetTicketList(ctx, &proto.Empty{})
+	req := &proto.GetTicketListRequest{}
+	if input != nil {
+		if input.ID != nil {
+			req.Id = int32(*input.ID)
+		}
+		if input.Status != nil {
+			req.Status = *input.Status
+		}
+	}
+	res, err := r.Resolver.grpcClient.GetTicketList(ctx, req)
 	if err != nil {
 		log.Panicf("[GQL] Tickets err: %v", err)
 	}

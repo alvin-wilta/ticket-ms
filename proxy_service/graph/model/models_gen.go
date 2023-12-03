@@ -25,8 +25,13 @@ type Ticket struct {
 	ID          *int    `json:"id,omitempty"`
 	Title       string  `json:"title"`
 	Description *string `json:"description,omitempty"`
-	Status      *string `json:"Status,omitempty"`
-	Name        string  `json:"Name"`
+	Status      *string `json:"status,omitempty"`
+	Name        string  `json:"name"`
+}
+
+type TicketFilter struct {
+	ID     *int    `json:"id,omitempty"`
+	Status *string `json:"status,omitempty"`
 }
 
 type UpdateTicket struct {
