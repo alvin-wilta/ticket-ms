@@ -1,22 +1,27 @@
 package nsq
 
 import (
+	"context"
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/alvin-wilta/ticket-ms/ticket_service/config"
 	"github.com/alvin-wilta/ticket-ms/ticket_service/db"
 	"github.com/nsqio/go-nsq"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type Handler struct {
 	dbw *gorm.DB
+	rdb *redis.Client
 }
 
-func New(dbw *gorm.DB, cfg *config.Config) nsq.Handler {
+func New(dbw *gorm.DB, rdb *redis.Client, cfg *config.Config) nsq.Handler {
 	return &Handler{
 		dbw: dbw,
+		rdb: rdb,
 	}
 }
 
@@ -43,6 +48,12 @@ func (h *Handler) HandleMessage(m *nsq.Message) error {
 		log.Panic(result.Error)
 		return err
 	}
+
+	// Cache result
+
+	ticketId := string(int32(ticket.ID))
+	ctx := context.Background()
+	h.rdb.Set(ctx, ticketId, m.Body, 5*time.Minute)
 
 	return nil
 }

@@ -16,10 +16,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
-
+	rdb := db.InitCache(cfg)
 	db := db.InitDB(cfg)
 	grpcServer := InitGRPC(db, cfg)
-	nsqHandler := nsq.New(db, cfg)
+	nsqHandler := nsq.New(db, rdb, cfg)
 	nsq.InitNSQConsumer("Create", cfg, nsqHandler.HandleMessage)
 
 	log.Printf("Server is listening on port %v...", cfg.ServicePort)

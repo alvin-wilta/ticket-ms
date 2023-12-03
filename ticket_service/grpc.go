@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
 	pb "github.com/alvin-wilta/ticket-ms/proto"
@@ -41,7 +42,19 @@ func (s *Server) GetTicketList(ctx context.Context, req *pb.GetTicketListRequest
 	query := s.db
 
 	if req.Id != 0 {
+		// Cache check, do not check if need status
+		if req.Status != "" {
+			cachedTicket, err := s.rdb.Get(ctx, string(req.Id)).Bytes()
+			if err != redis.Nil {
+				ticket := pb.Ticket{}
+				json.Unmarshal(cachedTicket, &ticket)
+				res.Tickets = append(res.Tickets, &ticket)
+				return &res, nil
+			}
+		}
+
 		query = query.Where("id = ?", req.Id)
+
 	}
 	if req.Status != "" {
 		query = query.Where("status = ?", req.Status)

@@ -27,7 +27,9 @@ func InitDB(c *config.Config) *gorm.DB {
 func InitCache(c *config.Config) *redis.Client {
 	addr := fmt.Sprintf("%s:%s", c.RedisAddr, c.RedisPort)
 	rdb := redis.NewClient(&redis.Options{
-		Addr: addr,
+		Addr:     addr,
+		Password: "",
+		DB:       0,
 	})
 	return rdb
 }
