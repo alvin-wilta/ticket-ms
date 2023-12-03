@@ -8,9 +8,33 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - '54320:5432'
+      - '5432:5432'
     volumes: 
       - db:/var/lib/postgresql/data
+
+  nsqlookupd:
+    image: nsqio/nsq
+    command: /nsqlookupd -broadcast-address=nsqd
+    ports:
+      - "4160" # nsqd discovery port for producers and clients (HTTP)
+      - "4161:4161" # nsqd register port (TCP)
+    restart: always
+  nsqd:
+    image: nsqio/nsq
+    command:  /nsqd --broadcast-address=nsqd --lookupd-tcp-address=nsqlookupd:4160
+    depends_on:
+      - nsqlookupd
+    ports:
+      - "5000:4150" # Port for producers and clients
+      - "5001:4151" # Port for monitoring, ping here
+  nsqadmin:
+    image: nsqio/nsq
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+    depends_on:
+      - nsqlookupd  
+    ports:
+      - "4171:4171" # Port for accessing the admin panel
+  
 volumes:
   db:
     driver: local

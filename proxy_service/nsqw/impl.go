@@ -7,6 +7,7 @@ import (
 )
 
 func (h *HandlerNSQ) PublishCreateTicket(message model.NewTicket) error {
+	log.Print("[NSQ] PublishCreateTicket request")
 	createMessage := &TicketMessage{
 		Title:       message.Title,
 		Description: message.Description,
@@ -22,6 +23,7 @@ func (h *HandlerNSQ) PublishCreateTicket(message model.NewTicket) error {
 }
 
 func (h *HandlerNSQ) PublishUpdateTicket(message model.UpdateTicket) error {
+	log.Print("[NSQ] PublishUpdateTicket request")
 	updateMessage := &UpdateMessage{
 		Id:     int32(message.ID),
 		Status: message.Status,
@@ -37,6 +39,7 @@ func (h *HandlerNSQ) PublishUpdateTicket(message model.UpdateTicket) error {
 }
 
 func (h *HandlerNSQ) PublishDeleteTicket(message model.DeleteTicket) error {
+	log.Print("[NSQ] PublishDeleteTicket request")
 	deleteMessage := &DeleteMessage{
 		Id: int32(message.ID),
 	}

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	pb "github.com/alvin-wilta/ticket-ms/proto"
+	"github.com/alvin-wilta/ticket-ms/ticket_service/config"
 	"github.com/alvin-wilta/ticket-ms/ticket_service/db"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
@@ -15,10 +16,11 @@ type Server struct {
 	db *gorm.DB
 }
 
-func InitGRPC(db *gorm.DB) *grpc.Server {
+func InitGRPC(db *gorm.DB, cfg *config.Config) *grpc.Server {
 	// Create a new gRPC server
 	grpcServer := grpc.NewServer()
 	pb.RegisterTicketServiceServer(grpcServer, &Server{db: db})
+	log.Print("[GRPC] GRPC Server running")
 	return grpcServer
 }
 

@@ -3,25 +3,21 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/alvin-wilta/ticket-ms/proxy_service/config"
 	"github.com/alvin-wilta/ticket-ms/proxy_service/graph"
 )
 
-const defaultPort = "50001"
-
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
+	cfg := config.New()
 
 	// NOTE: Initialize NSQ
-	nsqHandler := initNSQHandler()
+	nsqHandler := initNSQHandler(cfg)
+
 	// NOTE: Initialize gRPC
-	client := initGRPC()
+	client := initGRPC(cfg)
 
 	// NOTE: Initialize GQL handler
 	resolver := graph.InitResolver(*client, *nsqHandler)
@@ -35,6 +31,6 @@ func main() {
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
 
-	log.Printf("connect to http://localhost:%s/ ", port)
-	log.Fatal(http.ListenAndServe("localhost:"+port, nil))
+	log.Printf("connect to http://%s:%s/ ", cfg.ServiceAddr, cfg.ServicePort)
+	log.Fatal(http.ListenAndServe(cfg.ServiceAddr+":"+cfg.ServicePort, nil))
 }

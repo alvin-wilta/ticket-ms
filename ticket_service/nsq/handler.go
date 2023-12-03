@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/alvin-wilta/ticket-ms/ticket_service/config"
 	"github.com/alvin-wilta/ticket-ms/ticket_service/db"
 	"github.com/nsqio/go-nsq"
 	"gorm.io/gorm"
@@ -13,7 +14,7 @@ type Handler struct {
 	dbw *gorm.DB
 }
 
-func New(dbw *gorm.DB) nsq.Handler {
+func New(dbw *gorm.DB, cfg *config.Config) nsq.Handler {
 	return &Handler{
 		dbw: dbw,
 	}

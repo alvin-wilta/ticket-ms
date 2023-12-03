@@ -9,6 +9,7 @@ require (
 	github.com/alvin-wilta/ticket-ms/proto v0.0.0-00010101000000-000000000000
 	github.com/vektah/gqlparser/v2 v2.5.10
 	google.golang.org/grpc v1.59.0
+	github.com/nsqio/go-nsq v1.1.0
 )
 
 require (
@@ -21,7 +22,6 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.3 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/nsqio/go-nsq v1.1.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sosodev/duration v1.1.0 // indirect
 	github.com/urfave/cli/v2 v2.25.5 // indirect

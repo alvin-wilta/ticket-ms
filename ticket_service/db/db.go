@@ -1,14 +1,16 @@
 package db
 
 import (
+	"fmt"
 	"log"
 
+	"github.com/alvin-wilta/ticket-ms/ticket_service/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func InitDB() *gorm.DB {
-	dsn := "host=localhost user=postgres password=postgres port=54320 sslmode=disable"
+func InitDB(c *config.Config) *gorm.DB {
+	dsn := fmt.Sprintf("host=%v user=%v password=%v port=%v sslmode=disable", c.PostgresAddr, c.PostgresUser, c.PostgresPass, c.PostgresPort)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)

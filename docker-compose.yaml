@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  #SECTION - Databases
+  #  NOTE - Databases
   db:
     image: postgres
     restart: always
@@ -17,15 +17,14 @@ services:
       interval: 5s
       timeout: 60s
       retries: 5
-      
-  #!SECTION
-  #SECTION - NSQ
+
+  # NOTE - NSQ
   nsqlookupd:
     image: nsqio/nsq
     command: /nsqlookupd
     ports:
-      - "4160:4160"
-      - "4161:4161"
+      - "4160:4160" # nsqd discovery port for producers and clients (HTTP)
+      - "4161:4161" # nsqd register port (TCP)
     restart: always
   nsqd:
     image: nsqio/nsq
@@ -33,18 +32,18 @@ services:
     depends_on:
       - nsqlookupd
     ports:
-      - "4151:4151"
-      - "4150:4150"
+      - "4150:4150" # Port for producers and clients
+      - "4151:4151" # Port for monitoring
   nsqadmin:
     image: nsqio/nsq
     command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
     depends_on:
       - nsqlookupd  
     ports:
-      - "4171:4171"
+      - "4171:4171" # Port for accessing the admin panel
 
-  #!SECTION
-  #SECTION - Services
+  # NOTE - Services
+  # ANCHOR - TICKET SERVICE
   ticket_service:
     build:
       context: .
@@ -71,6 +70,7 @@ services:
       retries: 5
       start_period: 5s
 
+  # ANCHOR - PROXY SERVICE
   proxy_service:
     build:
       context: .
