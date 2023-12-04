@@ -85,6 +85,10 @@ Below are the network topology for the services:
 - [22/11/2023 - 29/11/2023] : Developing with dependency injection (as per campaign's docs) - Failed due to lots of abstractions
 - [30/11/2023 - 04/11/2023] : Developing with 'as-long-as-it-works' paradign - Backend 100% and Frontend 60% (not yet integrated)
 
+
+- Total (used) code written: 26.308 lines added and 519 lines deleted (including generated ones, excluding vendors/node_module)
+- Total (unused) code written: 22.963 lines added and 3,031 lines deleted
+
 ### Planned features
 - [x] Makefile for mundane tasks (running, generate proto, generate gql)
 - [x] One repo for everything - working with go.work
