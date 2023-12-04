@@ -1,4 +1,5 @@
 # GQL - Create Ticket
+[Back](../README.md#creating-new-ticket-flow)
 
 **Mutation**: CreateTicket
 
@@ -6,16 +7,24 @@
 
 ## Parameter
 
-| Field       | Type   | Description           |
-| ----------- | ------ | --------------------- |
-| Title       | string | ticket title          |
-| Description | string | ticket description    |
-| Name        | string | ticket requester name |
+| Field       | Type                  | Description           |
+| ----------- | --------------------- | --------------------- |
+| Title       | string **(required)** | ticket title          |
+| Description | string **(required)** | ticket description    |
+| Name        | string **(required)** | ticket requester name |
 
 ## Example Request
 
 ```
-mutation{
-    
+mutation CreateTicket {
+    createTicket(
+        input: { 
+            title: "title", 
+            description: "desc", 
+            name: "issuer" 
+        }) 
+        {
+            success
+    }
 }
 ```
